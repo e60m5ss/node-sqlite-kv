@@ -1,4 +1,4 @@
-import type { JournalMode, KVSyncOptions } from "@/types";
+import type { KVSyncOptions } from "@/types";
 import { DatabaseSync } from "node:sqlite";
 import { serialize, deserialize } from "node:v8";
 
