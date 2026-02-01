@@ -1,7 +1,7 @@
 {
     "name": "node-sqlite-kv",
     "description": "Key-value store with node:sqlite",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "author": {
         "name": "e60m5ss",
         "url": "https://github.com/e60m5ss"
