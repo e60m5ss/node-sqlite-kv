@@ -73,4 +73,11 @@ export class KVSync {
                 value: deserialize(record.value as any) as T,
             }));
     }
+
+    /**
+     * Remove all entries from the database
+     */
+    public clear(): void {
+        this.#db.exec("DELETE FROM kv");
+    }
 }
