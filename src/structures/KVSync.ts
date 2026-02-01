@@ -110,18 +110,58 @@ export class KVSync<T = any> {
     /**
      * Perform a transaction
      * @param callback Callback with KVSync instance
+     * @returns Object containing oldValues and newValues each containing arrays of keys and values
      */
-    public transaction(callback: (kv: KVSync<T>) => void): void {
+    public transaction<R>(callback: (kv: KVSync<T>) => R): {
+        oldValues: { key: string; value: T | null | undefined }[];
+        newValues: { key: string; value: T | null }[];
+    } {
         this.#db.exec("BEGIN TRANSACTION;");
-        try {
-            const tx = Object.create(this);
-            tx.#db = this.#db;
 
+        const oldMap = new Map<string, T | null | undefined>();
+        const newMap = new Map<string, T | null>();
+        const tx = Object.create(this);
+
+        tx.set = <K extends T>(key: string, value: K) => {
+            if (!oldMap.has(key)) {
+                const oldValue = this.get<K>(key);
+                oldMap.set(key, oldValue === null ? undefined : oldValue);
+            }
+
+            const result = this.set(key, value);
+            newMap.set(key, result);
+            return result;
+        };
+
+        tx.delete = (key: string) => {
+            if (!oldMap.has(key)) {
+                const oldValue = this.get<T>(key);
+                oldMap.set(key, oldValue === null ? undefined : oldValue);
+            }
+
+            newMap.set(key, null);
+            this.delete(key);
+            return oldMap.get(key);
+        };
+
+        try {
             callback(tx);
             this.#db.exec("COMMIT;");
         } catch (error: any) {
             this.#db.exec("ROLLBACK;");
             throw error;
         }
+
+        return {
+            oldValues: Array.from(oldMap.entries()).map(([key, value]) => ({
+                key,
+                value,
+            })),
+
+            newValues: Array.from(newMap.entries()).map(([key, value]) => ({
+                key,
+                value,
+            })),
+        };
     }
 }
