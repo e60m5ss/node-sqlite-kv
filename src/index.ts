@@ -1,1 +1,1 @@
-export { KVSync } from "./structures/KVSync";
+export { KVSync, KVSync as default } from "./structures/KVSync";
