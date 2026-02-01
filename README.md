@@ -58,6 +58,18 @@ kv.all();
 //      // ...
 // ];
 
+// transactions
+kv.set("user:1", { name: "Andrew", age: 19 });
+kv.set("user:2", { name: "Josh", age: 22 });
+kv.set("user:3", { name: "Gabe", age: 20 });
+
+// ...store what changed in transactions
+const { oldValues, newValues } = kv.transaction((tx) => {
+    tx.set("user:1", { name: "Andrew", age: 20 });
+    tx.set("user:4", { name: "Kris", age: 21 });
+    tx.delete("user:2");
+});
+
 // delete all entries
 kv.clear();
 ```
