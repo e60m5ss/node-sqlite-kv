@@ -1,6 +1,8 @@
 import type { JournalMode, KVSyncOptions } from "@/types";
 import { DatabaseSync } from "node:sqlite";
 import { serialize, deserialize } from "node:v8";
+import fs from "node:fs";
+import path from "node:path";
 
 /**
  * Class representing a synchronous key-value store
@@ -13,13 +15,19 @@ export class KVSync<T = any> {
      * @param path Where the database is stored, or `:memory:` for in-memory storage
      */
     public constructor(options?: KVSyncOptions) {
-        this.#db = new DatabaseSync(options?.path ?? ":memory:");
+        const dbPath = options?.path ?? ":memory:";
+
+        if (dbPath !== ":memory:") {
+            fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+        }
+
+        this.#db = new DatabaseSync(dbPath);
         this.setJournalMode(options?.journalMode ?? "DELETE");
         this.#db.exec(`
             CREATE TABLE IF NOT EXISTS kv (
                 key TEXT PRIMARY KEY NOT NULL,
                 value BLOB NOT NULL
-            ) STRICT
+            ) STRICT;
         `);
     }
 
