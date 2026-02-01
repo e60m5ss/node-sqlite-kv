@@ -1,6 +1,6 @@
 <h1 align="center">node-sqlite-kv</h1>
 
-> Key-value store with node:sqlite
+> Key-value store with node:sqlite (Node.js v22.5.0 or higher is required)
 
 ## Installation
 
