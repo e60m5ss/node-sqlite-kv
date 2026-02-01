@@ -111,17 +111,14 @@ export class KVSync<T = any> {
      * Perform a transaction
      * @param callback Callback with KVSync instance
      */
-    public transaction<R>(callback: (kv: KVSync<T>) => R): R {
+    public transaction(callback: (kv: KVSync<T>) => void): void {
         this.#db.exec("BEGIN TRANSACTION;");
-
         try {
-            const transactionalKV = Object.create(this);
-            transactionalKV.#db = this.#db;
+            const tx = Object.create(this);
+            tx.#db = this.#db;
 
-            const result = callback(transactionalKV);
+            callback(tx);
             this.#db.exec("COMMIT;");
-
-            return result;
         } catch (error: any) {
             this.#db.exec("ROLLBACK;");
             throw error;
