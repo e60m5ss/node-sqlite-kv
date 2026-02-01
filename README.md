@@ -19,9 +19,15 @@ bun add node-sqlite-kv
 ```js
 import { KVSync } from "node-sqlite-kv";
 
-// use :memory: for in-memory storage
-// path is optional, defaults to :memory:
-const kv = new KVSync("./data.sqlite");
+const kv = new KVSync({
+    // use :memory: for in-memory storage
+    // path is optional, defaults to :memory:
+    path: "./data.sqlite",
+
+    // optional journal mode
+    // default: DELETE
+    journalMode: "WAL",
+});
 
 // set values
 kv.set("number", 123);
