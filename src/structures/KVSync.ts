@@ -106,4 +106,25 @@ export class KVSync<T = any> {
         this.#db.exec(`PRAGMA journal_mode = ${mode}`);
         return this;
     }
+
+    /**
+     * Perform a transaction
+     * @param callback Callback with KVSync instance
+     */
+    public transaction<R>(callback: (kv: KVSync<T>) => R): R {
+        this.#db.exec("BEGIN TRANSACTION;");
+
+        try {
+            const transactionalKV = Object.create(this);
+            transactionalKV.#db = this.#db;
+
+            const result = callback(transactionalKV);
+            this.#db.exec("COMMIT;");
+
+            return result;
+        } catch (error: any) {
+            this.#db.exec("ROLLBACK;");
+            throw error;
+        }
+    }
 }
