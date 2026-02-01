@@ -1,18 +1,41 @@
+import type { JournalMode, KVSyncOptions } from "@/types";
 import { DatabaseSync } from "node:sqlite";
 import { serialize, deserialize } from "node:v8";
 
 /**
  * Class representing a synchronous key-value store
  */
-export class KVSync {
+export class KVSync<T = any> {
     #db: DatabaseSync;
 
     /**
      * Create a new key-value store
      * @param path Where the database is stored, or `:memory:` for in-memory storage
      */
-    public constructor(path: ":memory:" | (string & {}) = ":memory:") {
-        this.#db = new DatabaseSync(path);
+    public constructor(options?: KVSyncOptions) {
+        this.#db = new DatabaseSync(options?.path ?? ":memory:");
+
+        if (options?.journalMode) {
+            const journalModes = [
+                "DELETE",
+                "MEMORY",
+                "OFF",
+                "PERSIST",
+                "TRUNCATE",
+                "WAL",
+            ];
+
+            const mode = options?.journalMode.toUpperCase().trim();
+
+            if (!journalModes.includes(mode)) {
+                throw new Error(
+                    `Invalid KVSync journal mode specified. Received: "${mode}", expected one of: ${journalModes.join(", ")}`
+                );
+            }
+
+            this.#db.exec(`PRAGMA journal_mode = ${mode}`);
+        }
+
         this.#db.exec(`
             CREATE TABLE IF NOT EXISTS kv (
                 key TEXT PRIMARY KEY NOT NULL,
@@ -27,7 +50,7 @@ export class KVSync {
      * @param value Key value
      * @returns Provided value
      */
-    public set<T = any>(key: string, value: T): T {
+    public set<K = T>(key: string, value: K): K {
         this.#db
             .prepare("INSERT OR REPLACE INTO kv (key, value) VALUES (?, ?)")
             .run(key, serialize(value));
@@ -40,9 +63,9 @@ export class KVSync {
      * @param key Key name
      * @returns Value or null
      */
-    public get<T = any>(key: string): T | null {
+    public get<K = T>(key: string): K | null {
         const row = this.#db.prepare("SELECT value FROM kv WHERE key = ?").get(key);
-        return row ? (deserialize(row.value as any) as T) : null;
+        return row ? (deserialize(row.value as any) as K) : null;
     }
 
     /**
@@ -50,8 +73,8 @@ export class KVSync {
      * @param key Key name
      * @returns Deleted key or null
      */
-    public delete<T = any>(key: string): T | null {
-        const existing = this.get<T>(key);
+    public delete<K = T>(key: string): K | null {
+        const existing = this.get<K>(key);
 
         if (existing !== null) {
             this.#db.prepare("DELETE FROM kv WHERE key = ?").run(key);
@@ -64,13 +87,13 @@ export class KVSync {
      * Get all data in the database
      * @returns Array of objects containing keys and values
      */
-    public all<T = any>(): { key: string; value: T }[] {
+    public all<K = T>(): { key: string; value: K }[] {
         return this.#db
             .prepare("SELECT key, value FROM kv")
             .all()
             .map((record) => ({
                 key: record.key as string,
-                value: deserialize(record.value as any) as T,
+                value: deserialize(record.value as any) as K,
             }));
     }
 
