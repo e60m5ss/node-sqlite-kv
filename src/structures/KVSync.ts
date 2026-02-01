@@ -1,4 +1,4 @@
-import type { KVSyncOptions } from "@/types";
+import type { JournalMode, KVSyncOptions } from "@/types";
 import { DatabaseSync } from "node:sqlite";
 import { serialize, deserialize } from "node:v8";
 
@@ -14,28 +14,7 @@ export class KVSync<T = any> {
      */
     public constructor(options?: KVSyncOptions) {
         this.#db = new DatabaseSync(options?.path ?? ":memory:");
-
-        if (options?.journalMode) {
-            const journalModes = [
-                "DELETE",
-                "MEMORY",
-                "OFF",
-                "PERSIST",
-                "TRUNCATE",
-                "WAL",
-            ];
-
-            const mode = options?.journalMode.toUpperCase().trim();
-
-            if (!journalModes.includes(mode)) {
-                throw new Error(
-                    `Invalid KVSync journal mode specified. Received: "${mode}", expected one of: ${journalModes.join(", ")}`
-                );
-            }
-
-            this.#db.exec(`PRAGMA journal_mode = ${mode}`);
-        }
-
+        this.setJournalMode(options?.journalMode ?? "DELETE");
         this.#db.exec(`
             CREATE TABLE IF NOT EXISTS kv (
                 key TEXT PRIMARY KEY NOT NULL,
@@ -102,5 +81,29 @@ export class KVSync<T = any> {
      */
     public clear(): void {
         this.#db.exec("DELETE FROM kv");
+    }
+
+    /**
+     * Updates the journal mode
+     * @param mode New journal mode
+     */
+    public setJournalMode(mode: JournalMode) {
+        const journalModes = [
+            "DELETE",
+            "MEMORY",
+            "OFF",
+            "PERSIST",
+            "TRUNCATE",
+            "WAL",
+        ];
+
+        if (!journalModes.includes(mode)) {
+            throw new Error(
+                `Invalid KVSync journal mode specified. Received: "${mode}", expected one of: ${journalModes.join(", ")}`
+            );
+        }
+
+        this.#db.exec(`PRAGMA journal_mode = ${mode}`);
+        return this;
     }
 }
