@@ -73,17 +73,16 @@ export class KVSync<T = any> {
      * @param value Key value
      * @returns Provided value
      */
-    public set<K = T>(key: string, value: K): K {
-        if (!key || !value) {
-            throw new Error(
-                "[KVSync]: A key and value must be provided when using set()."
-            );
-        }
-
-        if (typeof key !== "string") {
+    public set<K = T>(key: string, value: K | undefined): K | null {
+        if (!key || typeof key !== "string") {
             throw new Error(
                 `[KVSync]: Keys must be of type string. Received: ${typeof key}`
             );
+        }
+
+        if (value === undefined) {
+            this.delete(key);
+            return null;
         }
 
         this.#db
