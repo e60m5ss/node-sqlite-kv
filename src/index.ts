@@ -163,7 +163,7 @@ export class KVSync<T = any> {
      * Remove all entries from the database
      */
     public clear(): KVSync {
-        this.#db.exec("DELETE FROM kv");
+        this.#db.exec("DELETE FROM kv;");
         return this;
     }
 
@@ -178,7 +178,7 @@ export class KVSync<T = any> {
             );
         }
 
-        this.#db.exec(`PRAGMA journal_mode = ${mode}`);
+        this.#db.exec(`PRAGMA journal_mode = ${mode};`);
         return this;
     }
 
