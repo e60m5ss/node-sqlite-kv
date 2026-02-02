@@ -76,7 +76,7 @@ export class KVSync<T = any> {
     public set<K = T>(key: string, value: K | undefined): K | null {
         if (!key || typeof key !== "string") {
             throw new Error(
-                `[KVSync]: Keys must be of type string. Received: ${typeof key}`
+                "[KVSync]: Key must be provided and be a non-empty string."
             );
         }
 
@@ -98,13 +98,9 @@ export class KVSync<T = any> {
      * @returns Value or null
      */
     public get<K = T>(key: string): K | null {
-        if (!key) {
-            throw new Error("[KVSync]: A key must be provided when using get().");
-        }
-
-        if (typeof key !== "string") {
+        if (!key || typeof key !== "string") {
             throw new Error(
-                `[KVSync]: Keys must be of type string. Received: ${typeof key}`
+                "[KVSync]: Key must be provided and be a non-empty string."
             );
         }
 
@@ -117,24 +113,15 @@ export class KVSync<T = any> {
      * @param key Key name
      * @returns Deleted key or null
      */
-    public delete<K = T>(key: string): K | null {
-        if (!key) {
-            throw new Error("[KVSync]: A key must be provided when using delete().");
-        }
-
-        if (typeof key !== "string") {
+    public delete<K = T>(key: string): KVSync {
+        if (!key || typeof key !== "string") {
             throw new Error(
-                `[KVSync]: Keys must be of type string. Received: ${typeof key}`
+                "[KVSync]: Key must be provided and be a non-empty string."
             );
         }
 
-        const existing = this.get<K>(key);
-
-        if (existing !== null) {
-            this.#db.prepare("DELETE FROM kv WHERE key = ?").run(key);
-        }
-
-        return existing;
+        this.#db.prepare("DELETE FROM kv WHERE key = ?").run(key);
+        return this;
     }
 
     /**
