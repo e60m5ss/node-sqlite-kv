@@ -73,7 +73,7 @@ export class KVSync<T = any> {
      * @param value Key value
      * @returns Provided value
      */
-    public set<K = T>(key: string, value: K | undefined): K | null {
+    public set<K = T>(key: string, value: K | undefined): K {
         if (!key || typeof key !== "string") {
             throw new Error(
                 "[KVSync]: Key must be provided and be a non-empty string."
@@ -81,8 +81,9 @@ export class KVSync<T = any> {
         }
 
         if (value === undefined) {
-            this.delete(key);
-            return null;
+            throw new Error(
+                "[KVSync]: Provided value is undefined. Did you mean to use delete() instead?"
+            );
         }
 
         this.#db
