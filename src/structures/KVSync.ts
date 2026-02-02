@@ -87,8 +87,9 @@ export class KVSync<T = any> {
     /**
      * Remove all entries from the database
      */
-    public clear(): void {
+    public clear(): KVSync {
         this.#db.exec("DELETE FROM kv");
+        return this;
     }
 
     /**
