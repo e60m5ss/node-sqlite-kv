@@ -188,8 +188,6 @@ export class KVSync<T = any> {
             );
         }
 
-        this.#db.exec("BEGIN TRANSACTION;");
-
         const oldMap = new Map<string, T | null | undefined>();
         const newMap = new Map<string, T | null>();
         const tx = Object.create(this);
@@ -200,9 +198,8 @@ export class KVSync<T = any> {
                 oldMap.set(key, oldValue === null ? undefined : oldValue);
             }
 
-            const result = this.set(key, value);
-            newMap.set(key, result);
-            return result;
+            newMap.set(key, value as K);
+            return value ?? null;
         };
 
         tx.delete = (key: string): KVSync => {
@@ -212,12 +209,21 @@ export class KVSync<T = any> {
             }
 
             newMap.set(key, null);
-            this.delete(key);
             return tx;
         };
 
         try {
             callback(tx);
+            this.#db.exec("BEGIN TRANSACTION;");
+
+            for (const [key, value] of newMap.entries()) {
+                if (value === null) {
+                    this.delete(key);
+                } else {
+                    this.set(key, value);
+                }
+            }
+
             this.#db.exec("COMMIT;");
         } catch (error: any) {
             this.#db.exec("ROLLBACK;");
