@@ -196,7 +196,7 @@ export class KVSync<T = any> {
         const newMap = new Map<string, T | null>();
         const tx = Object.create(this);
 
-        tx.set = <K extends T>(key: string, value: K) => {
+        tx.set = <K extends T>(key: string, value: K | undefined): K | null => {
             if (!oldMap.has(key)) {
                 const oldValue = this.get<K>(key);
                 oldMap.set(key, oldValue === null ? undefined : oldValue);
@@ -207,7 +207,7 @@ export class KVSync<T = any> {
             return result;
         };
 
-        tx.delete = (key: string) => {
+        tx.delete = (key: string): KVSync => {
             if (!oldMap.has(key)) {
                 const oldValue = this.get<T>(key);
                 oldMap.set(key, oldValue === null ? undefined : oldValue);
@@ -215,7 +215,7 @@ export class KVSync<T = any> {
 
             newMap.set(key, null);
             this.delete(key);
-            return oldMap.get(key);
+            return tx;
         };
 
         try {
