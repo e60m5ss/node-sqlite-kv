@@ -47,7 +47,7 @@ export class KVSync<T = any> {
     #db: DatabaseSync;
 
     /**
-     * Create a new key-value store
+     * Instantiate a new key-value store
      * @param path Where the database is stored, or `:memory:` for in-memory storage
      */
     public constructor(options?: KVSyncOptions) {
@@ -68,7 +68,7 @@ export class KVSync<T = any> {
     }
 
     /**
-     * Sets a key in the database
+     * Set a key in the database
      * @param key Key name
      * @param value Key value
      * @returns Provided value
@@ -93,7 +93,7 @@ export class KVSync<T = any> {
     }
 
     /**
-     * Gets a value from the database
+     * Get a value from the database
      * @param key Key name
      * @returns Value or null
      */
@@ -109,7 +109,7 @@ export class KVSync<T = any> {
     }
 
     /**
-     * Deletes a key from the database
+     * Delete a key from the database
      * @param key Key name
      * @returns KVSync instance
      */
@@ -155,7 +155,7 @@ export class KVSync<T = any> {
     }
 
     /**
-     * Updates the journal mode
+     * Update the journal mode
      * @param mode New journal mode
      */
     public setJournalMode(mode: JournalMode) {
