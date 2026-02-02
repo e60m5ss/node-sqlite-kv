@@ -74,6 +74,18 @@ export class KVSync<T = any> {
      * @returns Provided value
      */
     public set<K = T>(key: string, value: K): K {
+        if (!key || !value) {
+            throw new Error(
+                "[KVSync]: A key and value must be provided when using set()."
+            );
+        }
+
+        if (typeof key !== "string") {
+            throw new Error(
+                `[KVSync]: Keys must be of type string. Received: ${typeof key}`
+            );
+        }
+
         this.#db
             .prepare("INSERT OR REPLACE INTO kv (key, value) VALUES (?, ?)")
             .run(key, serialize(value));
@@ -87,6 +99,16 @@ export class KVSync<T = any> {
      * @returns Value or null
      */
     public get<K = T>(key: string): K | null {
+        if (!key) {
+            throw new Error("[KVSync]: A key must be provided when using get().");
+        }
+
+        if (typeof key !== "string") {
+            throw new Error(
+                `[KVSync]: Keys must be of type string. Received: ${typeof key}`
+            );
+        }
+
         const row = this.#db.prepare("SELECT value FROM kv WHERE key = ?").get(key);
         return row ? (deserialize(row.value as any) as K) : null;
     }
@@ -97,6 +119,16 @@ export class KVSync<T = any> {
      * @returns Deleted key or null
      */
     public delete<K = T>(key: string): K | null {
+        if (!key) {
+            throw new Error("[KVSync]: A key must be provided when using delete().");
+        }
+
+        if (typeof key !== "string") {
+            throw new Error(
+                `[KVSync]: Keys must be of type string. Received: ${typeof key}`
+            );
+        }
+
         const existing = this.get<K>(key);
 
         if (existing !== null) {
@@ -135,7 +167,7 @@ export class KVSync<T = any> {
     public setJournalMode(mode: JournalMode) {
         if (!journalModes.includes(mode)) {
             throw new Error(
-                `Invalid KVSync journal mode specified. Received: "${mode}", expected one of: ${journalModes.join(", ")}`
+                `[KVSync]: Invalid journal mode specified. Received: "${mode}", expected one of: ${journalModes.join(", ")}`
             );
         }
 
@@ -152,6 +184,18 @@ export class KVSync<T = any> {
         oldValues: { key: string; value: T | null | undefined }[];
         newValues: { key: string; value: T | null }[];
     } {
+        if (!callback) {
+            throw new Error(
+                "[KVSync]: A callback must be provided when using transaction()."
+            );
+        }
+
+        if (typeof callback !== "function") {
+            throw new Error(
+                `[KVSync]: Transaction callback must be of type function. Received: ${typeof callback}`
+            );
+        }
+
         this.#db.exec("BEGIN TRANSACTION;");
 
         const oldMap = new Map<string, T | null | undefined>();
