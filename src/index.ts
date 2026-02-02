@@ -141,14 +141,22 @@ export class KVSync<T = any> {
      * Get all data in the database
      * @returns Array of objects containing keys and values
      */
-    public all<K = T>(): { key: string; value: K }[] {
-        return this.#db
-            .prepare("SELECT key, value FROM kv")
-            .all()
-            .map((record) => ({
-                key: record.key as string,
-                value: deserialize(record.value as any) as K,
-            }));
+    public all<K = T>(
+        filter?: (key: string, value: K) => boolean
+    ): { key: string; value: K }[] {
+        const rows = this.#db.prepare("SELECT key, value FROM kv").iterate();
+        const result: { key: string; value: K }[] = [];
+
+        for (const row of rows as any) {
+            const key = row.key as string;
+            const value = deserialize(row.value as any) as K;
+
+            if (!filter || filter(key, value)) {
+                result.push({ key, value });
+            }
+        }
+
+        return result;
     }
 
     /**
