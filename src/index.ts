@@ -59,12 +59,9 @@ export class KVSync<T = any> {
 
         this.#db = new DatabaseSync(dbPath);
         this.setJournalMode(options?.journalMode ?? "DELETE");
-        this.#db.exec(`
-            CREATE TABLE IF NOT EXISTS kv (
-                key TEXT PRIMARY KEY NOT NULL,
-                value BLOB NOT NULL
-            ) STRICT;
-        `);
+        this.#db.exec(
+            "CREATE TABLE IF NOT EXISTS kv (key TEXT PRIMARY KEY NOT NULL, value BLOB NOT NULL) STRICT;"
+        );
     }
 
     /**
