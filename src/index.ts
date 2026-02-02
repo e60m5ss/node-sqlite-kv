@@ -111,9 +111,9 @@ export class KVSync<T = any> {
     /**
      * Deletes a key from the database
      * @param key Key name
-     * @returns Deleted key or null
+     * @returns KVSync instance
      */
-    public delete<K = T>(key: string): KVSync {
+    public delete(key: string): KVSync {
         if (!key || typeof key !== "string") {
             throw new Error(
                 "[KVSync]: Key must be provided and be a non-empty string."
