@@ -48,7 +48,7 @@ export class KVSync<T = any> {
 
     /**
      * Instantiate a new key-value store
-     * @param path Where the database is stored, or `:memory:` for in-memory storage
+     * @param options KVSync options
      */
     public constructor(options?: KVSyncOptions) {
         const dbPath = options?.path ?? ":memory:";
