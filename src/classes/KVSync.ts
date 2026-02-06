@@ -1,6 +1,7 @@
 import type { JournalMode, KVSyncOptions } from "@/types";
 import { DatabaseSync } from "node:sqlite";
 import { serialize, deserialize } from "node:v8";
+import { KVError } from "@/classes/KVError";
 import { journalModes } from "@/utils";
 import fs from "node:fs";
 import path from "node:path";
@@ -40,14 +41,16 @@ export class KVSync<T = any> {
      */
     public set<K = T>(key: string, value: K | undefined): K {
         if (!key || typeof key !== "string") {
-            throw new Error(
-                "[KVSync]: Key must be provided and be a non-empty string."
+            throw new KVError(
+                "set",
+                "Key must be provided and be a non-empty string"
             );
         }
 
         if (value === undefined) {
-            throw new Error(
-                "[KVSync]: Provided value is undefined. Did you mean to use delete() instead?"
+            throw new KVError(
+                "set",
+                "Provided value is undefined, did you mean to use delete()?"
             );
         }
 
@@ -65,8 +68,9 @@ export class KVSync<T = any> {
      */
     public get<K = T>(key: string): K | null {
         if (!key || typeof key !== "string") {
-            throw new Error(
-                "[KVSync]: Key must be provided and be a non-empty string."
+            throw new KVError(
+                "get",
+                "Key must be provided and be a non-empty string."
             );
         }
 
@@ -81,8 +85,9 @@ export class KVSync<T = any> {
      */
     public delete(key: string): KVSync {
         if (!key || typeof key !== "string") {
-            throw new Error(
-                "[KVSync]: Key must be provided and be a non-empty string."
+            throw new KVError(
+                "delete",
+                "Key must be provided and be a non-empty string."
             );
         }
 
@@ -126,8 +131,9 @@ export class KVSync<T = any> {
      */
     public setJournalMode(mode: JournalMode) {
         if (!journalModes.includes(mode)) {
-            throw new Error(
-                `[KVSync]: Invalid journal mode specified. Received: "${mode}", expected one of: ${journalModes.join(", ")}`
+            throw new KVError(
+                "setJournalMode",
+                `Invalid journal mode specified - received: "${mode}", expected one of: ${journalModes.join(", ")}`
             );
         }
 
@@ -145,14 +151,16 @@ export class KVSync<T = any> {
         newValues: { key: string; value: T | null }[];
     } {
         if (!callback) {
-            throw new Error(
-                "[KVSync]: A callback must be provided when using transaction()."
+            throw new KVError(
+                "transaction",
+                "A callback must be provided when using transaction()."
             );
         }
 
         if (typeof callback !== "function") {
-            throw new Error(
-                `[KVSync]: Transaction callback must be of type function. Received: ${typeof callback}`
+            throw new KVError(
+                "transaction",
+                `Transaction callback must be of type function. Received: ${typeof callback}`
             );
         }
 
