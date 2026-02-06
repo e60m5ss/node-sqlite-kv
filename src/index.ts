@@ -7,13 +7,7 @@ import path from "node:path";
  * SQLite journal mode
  * @default DELETE
  */
-export type JournalMode =
-    | "DELETE"
-    | "MEMORY"
-    | "OFF"
-    | "PERSIST"
-    | "TRUNCATE"
-    | "WAL";
+export type JournalMode = (typeof journalModes)[number];
 
 /**
  * Configuration options for instantiating a KVSync
@@ -31,14 +25,14 @@ export type SQLitePath = ":memory:" | (string & {});
 /**
  * A list of journal modes SQLite supports
  */
-export const journalModes: JournalMode[] = [
+export const journalModes = [
     "DELETE",
     "MEMORY",
     "OFF",
     "PERSIST",
     "TRUNCATE",
     "WAL",
-];
+] as const;
 
 /**
  * Class representing a synchronous key-value store
