@@ -9,9 +9,16 @@
         "name": "e60m5ss",
         "url": "https://github.com/e60m5ss"
     },
-    "main": "./dist/index.cjs",
+    "main": "./dist/index.mjs",
     "module": "./dist/index.mjs",
     "types": "./dist/index.d.mts",
+    "type": "module",
+    "exports": {
+        "default": "./dist/index.cjs",
+        "import": "./dist/index.mjs",
+        "require": "./dist/index.cjs",
+        "types": "./dist/index.d.cts"
+    },
     "engineStrict": true,
     "engines": {
         "node": ">=22.5.0"
