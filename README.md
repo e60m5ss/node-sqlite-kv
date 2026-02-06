@@ -78,6 +78,9 @@ const { oldValues, newValues } = kv.transaction((tx) => {
 
 // delete all entries
 kv.clear();
+
+// close the database
+kv.close();
 ```
 
 ## Contributing
