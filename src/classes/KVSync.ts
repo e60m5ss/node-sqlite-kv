@@ -217,8 +217,8 @@ export class KVSync<T = any> {
         };
 
         try {
-            callback(tx);
             this.#db.exec("BEGIN TRANSACTION;");
+            callback(tx);
 
             for (const [key, value] of newMap.entries()) {
                 if (value === null) {
