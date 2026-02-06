@@ -1,11 +1,11 @@
-import type { journalModes } from "@/utils";
+import { journalModes } from "@/utils";
 
 /**
  * SQLite journal mode
  * @default DELETE (:memory: databases)
  * @default WAL (persistent databases)
  */
-export type JournalMode = (typeof journalModes)[number];
+export type JournalMode = (typeof journalModes)[keyof typeof journalModes];
 
 /**
  * Configuration options for instantiating a KVSync

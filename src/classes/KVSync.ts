@@ -25,7 +25,8 @@ export class KVSync<T = any> {
 
         this.#db = new DatabaseSync(dbPath);
         this.setJournalMode(
-            options?.journalMode ?? (dbPath !== ":memory:" ? "WAL" : "DELETE")
+            options?.journalMode ??
+                (dbPath !== ":memory:" ? journalModes.WAL : journalModes.Delete)
         );
 
         this.#db.exec(
@@ -82,7 +83,7 @@ export class KVSync<T = any> {
             );
         }
 
-        const row = this.#db.prepare("SELECT value FROM kv WHERE key = ?").get(key);
+        const row = this.#db.prepare("SELECT value FROM kv WHERE key = ?;").get(key);
         return row ? (deserialize(row.value as any) as K) : null;
     }
 
@@ -103,7 +104,7 @@ export class KVSync<T = any> {
             );
         }
 
-        this.#db.prepare("DELETE FROM kv WHERE key = ?").run(key);
+        this.#db.prepare("DELETE FROM kv WHERE key = ?;").run(key);
         return this;
     }
 
@@ -154,10 +155,10 @@ export class KVSync<T = any> {
             throw new KVError("setJournalMode", "Database is not open");
         }
 
-        if (!journalModes.includes(mode)) {
+        if (!Object.values(journalModes).includes(mode)) {
             throw new KVError(
                 "setJournalMode",
-                `Invalid journal mode specified - received: "${mode}", expected one of: ${journalModes.join(", ")}`
+                `Invalid journal mode specified - received: "${mode}", expected one of: ${Object.values(journalModes).join(", ")}`
             );
         }
 
