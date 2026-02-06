@@ -240,4 +240,11 @@ export class KVSync<T = any> {
             })),
         };
     }
+
+    /**
+     * Close the database
+     */
+    public close(): void {
+        this.#db.close();
+    }
 }
