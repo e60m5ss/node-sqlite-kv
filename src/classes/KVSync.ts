@@ -248,11 +248,20 @@ export class KVSync<T = any> {
     }
 
     /**
+     * Open the database
+     */
+    public open(): void {
+        if (this.#db.isOpen) {
+            throw new KVError("open", "Database is open");
+        }
+    }
+
+    /**
      * Close the database
      */
     public close(): void {
         if (!this.#db.isOpen) {
-            throw new KVError("get", "Database is not open");
+            throw new KVError("close", "Database is not open");
         }
 
         this.#db.close();
