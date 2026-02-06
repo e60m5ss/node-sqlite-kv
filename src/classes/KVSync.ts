@@ -40,6 +40,10 @@ export class KVSync<T = any> {
      * @returns Provided value
      */
     public set<K = T>(key: string, value: K | undefined): K {
+        if (!this.#db.isOpen) {
+            throw new KVError("set", "Database is not open");
+        }
+
         if (!key || typeof key !== "string") {
             throw new KVError(
                 "set",
@@ -67,6 +71,10 @@ export class KVSync<T = any> {
      * @returns Value or null
      */
     public get<K = T>(key: string): K | null {
+        if (!this.#db.isOpen) {
+            throw new KVError("get", "Database is not open");
+        }
+
         if (!key || typeof key !== "string") {
             throw new KVError(
                 "get",
@@ -84,6 +92,10 @@ export class KVSync<T = any> {
      * @returns KVSync instance
      */
     public delete(key: string): KVSync {
+        if (!this.#db.isOpen) {
+            throw new KVError("delete", "Database is not open");
+        }
+
         if (!key || typeof key !== "string") {
             throw new KVError(
                 "delete",
@@ -102,6 +114,10 @@ export class KVSync<T = any> {
     public all<K = T>(
         filter?: (key: string, value: K) => boolean
     ): { key: string; value: K }[] {
+        if (!this.#db.isOpen) {
+            throw new KVError("all", "Database is not open");
+        }
+
         const rows = this.#db.prepare("SELECT key, value FROM kv").iterate();
         const result: { key: string; value: K }[] = [];
 
@@ -121,6 +137,10 @@ export class KVSync<T = any> {
      * Remove all entries from the database
      */
     public clear(): KVSync {
+        if (!this.#db.isOpen) {
+            throw new KVError("clear", "Database is not open");
+        }
+
         this.#db.exec("DELETE FROM kv;");
         return this;
     }
@@ -130,6 +150,10 @@ export class KVSync<T = any> {
      * @param mode New journal mode
      */
     public setJournalMode(mode: JournalMode) {
+        if (!this.#db.isOpen) {
+            throw new KVError("setJournalMode", "Database is not open");
+        }
+
         if (!journalModes.includes(mode)) {
             throw new KVError(
                 "setJournalMode",
@@ -150,6 +174,10 @@ export class KVSync<T = any> {
         oldValues: { key: string; value: T | null | undefined }[];
         newValues: { key: string; value: T | null }[];
     } {
+        if (!this.#db.isOpen) {
+            throw new KVError("transaction", "Database is not open");
+        }
+
         if (!callback) {
             throw new KVError(
                 "transaction",
@@ -223,6 +251,10 @@ export class KVSync<T = any> {
      * Close the database
      */
     public close(): void {
+        if (!this.#db.isOpen) {
+            throw new KVError("get", "Database is not open");
+        }
+
         this.#db.close();
     }
 }
