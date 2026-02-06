@@ -5,7 +5,8 @@ import path from "node:path";
 
 /**
  * SQLite journal mode
- * @default DELETE
+ * @default DELETE (:memory: databases)
+ * @default WAL (persistent databases)
  */
 export type JournalMode = (typeof journalModes)[number];
 
@@ -52,7 +53,10 @@ export class KVSync<T = any> {
         }
 
         this.#db = new DatabaseSync(dbPath);
-        this.setJournalMode(options?.journalMode ?? "DELETE");
+        this.setJournalMode(
+            options?.journalMode ?? (dbPath !== ":memory:" ? "WAL" : "DELETE")
+        );
+
         this.#db.exec(
             "CREATE TABLE IF NOT EXISTS kv (key TEXT PRIMARY KEY NOT NULL, value BLOB NOT NULL) STRICT;"
         );
