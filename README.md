@@ -24,8 +24,9 @@ const kv = new KVSync({
     // path is optional, defaults to :memory:
     path: "./data.sqlite",
 
-    // optional journal mode
-    // default: DELETE
+    // sqlite journal mode
+    // default DELETE for in-memory stores,
+    // and WAL for persistent ones
     journalMode: "WAL",
 });
 
@@ -85,7 +86,7 @@ kv.close();
 
 ## Contributing
 
-Pull requests are always welcomed. For more major changes, please open an issue to discuss what you wish to change.
+[pnpm](https://pnpm.io) is used throughout this project for packages and scripts. Pull requests are always welcome. For more major changes, please open an issue to discuss what you wish to change.
 
 ## License
 
