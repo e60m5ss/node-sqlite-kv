@@ -1,7 +1,7 @@
 import type { JournalMode, KVSyncOptions } from "@/types";
 import { DatabaseSync } from "node:sqlite";
-import { serialize, deserialize } from "node:v8";
 import { KVError } from "@/classes/KVError";
+import { deserialize, serialize } from "node:v8";
 import { journalModes } from "@/utils";
 import fs from "node:fs";
 import path from "node:path";
@@ -60,7 +60,7 @@ export class KVSync<T = any> {
         }
 
         this.#db
-            .prepare("INSERT OR REPLACE INTO kv (key, value) VALUES (?, ?)")
+            .prepare("INSERT OR REPLACE INTO kv (key, value) VALUES (?, ?);")
             .run(key, serialize(value));
 
         return value;
@@ -83,7 +83,9 @@ export class KVSync<T = any> {
             );
         }
 
-        const row = this.#db.prepare("SELECT value FROM kv WHERE key = ?;").get(key);
+        const row = this.#db
+            .prepare("SELECT value FROM kv WHERE key = ?;")
+            .get(key);
         return row ? (deserialize(row.value as any) as K) : null;
     }
 
@@ -119,7 +121,7 @@ export class KVSync<T = any> {
             throw new KVError("all", "Database is not open");
         }
 
-        const rows = this.#db.prepare("SELECT key, value FROM kv").iterate();
+        const rows = this.#db.prepare("SELECT key, value FROM kv;").iterate();
         const result: { key: string; value: K }[] = [];
 
         for (const row of rows as any) {

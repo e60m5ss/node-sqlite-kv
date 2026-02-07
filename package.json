@@ -31,7 +31,7 @@
     },
     "prettier": {
         "jsxSingleQuote": false,
-        "printWidth": 80,
+        "printWidth": 85,
         "semi": true,
         "singleQuote": false,
         "tabWidth": 4,
