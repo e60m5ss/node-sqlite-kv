@@ -83,9 +83,7 @@ export class KVSync<T = any> {
             );
         }
 
-        const row = this.#db
-            .prepare("SELECT value FROM kv WHERE key = ?;")
-            .get(key);
+        const row = this.#db.prepare("SELECT value FROM kv WHERE key = ?;").get(key);
         return row ? (deserialize(row.value as any) as K) : null;
     }
 
